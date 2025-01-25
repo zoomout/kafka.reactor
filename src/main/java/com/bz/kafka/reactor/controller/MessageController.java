@@ -4,6 +4,8 @@ import com.bz.kafka.reactor.service.KafkaConsumerService;
 import com.bz.kafka.reactor.service.KafkaProducerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -16,14 +18,13 @@ public class MessageController {
     private final KafkaConsumerService kafkaConsumerService;
 
     @PostMapping
-    public String sendMessage(@RequestBody String message) {
-        kafkaProducerService.sendMessage("my-topic", message);
-        return "OK";
+    public Mono<String> sendMessage(@RequestBody String message) {
+        return Mono.defer(() -> kafkaProducerService.sendMessage("my-topic", message));
     }
 
     @GetMapping
-    public List<String> getMessages() {
-        return kafkaConsumerService.getMessages();
+    public Mono<List<String>> getMessages() {
+        return Flux.defer(kafkaConsumerService::getMessages).collectList();
     }
 
 }
