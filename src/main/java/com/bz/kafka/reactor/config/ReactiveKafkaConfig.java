@@ -11,7 +11,7 @@ import reactor.kafka.sender.SenderOptions;
 import java.util.List;
 
 @Configuration
-public class ReactiveKafkaProducerConfig {
+public class ReactiveKafkaConfig {
 
     @Bean
     public ReactiveKafkaProducerTemplate<String, String> reactiveKafkaProducerTemplate(
