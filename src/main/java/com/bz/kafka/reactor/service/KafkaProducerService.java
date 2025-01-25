@@ -17,10 +17,10 @@ public class KafkaProducerService {
 
     public Mono<String> sendMessage(String topic, String message) {
         return Mono.fromCallable(() -> UUID.randomUUID().toString())
-                .flatMap(key -> reactiveKafkaProducerTemplate.send(topic, key, message)
-                        .doOnSuccess(result -> log.info("Sent message key - {}, value - {}", key, message))
-                        .doOnError(e -> log.error("Couldn't send message", e))
-                        .map(r -> key)
+                        .flatMap(key -> reactiveKafkaProducerTemplate.send(topic, key, message)
+                                .doOnSuccess(result -> log.info("Sent message key - {}, value - {}", key, message))
+                                .doOnError(e -> log.error("Couldn't send message", e))
+                                .map(r -> key)
                 );
     }
 

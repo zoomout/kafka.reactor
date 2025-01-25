@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.when;
 @Import(TestDockerConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles(profiles = "test")
 class KafkaReactorApplicationIntegrationTest {
 
     @MockitoSpyBean
