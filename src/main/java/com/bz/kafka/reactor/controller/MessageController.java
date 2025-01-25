@@ -27,4 +27,9 @@ public class MessageController {
         return Flux.defer(kafkaConsumerService::getMessages).collectList();
     }
 
+    @DeleteMapping
+    public Mono<Void> deleteMessages() {
+        return Mono.defer(kafkaConsumerService::deleteMessages);
+    }
+
 }

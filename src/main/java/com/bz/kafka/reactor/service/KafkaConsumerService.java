@@ -1,28 +1,41 @@
 package com.bz.kafka.reactor.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.kafka.core.reactive.ReactiveKafkaConsumerTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class KafkaConsumerService {
 
-    private static final List<String> MESSAGES = new CopyOnWriteArrayList<>();
+    private final ReactiveKafkaConsumerTemplate<String, String> reactiveKafkaConsumerTemplate;
+    private final StorageService storageService;
 
-    @KafkaListener(topics = "my-topic", groupId = "my-consumer-group")
-    public void consume(ConsumerRecord<String, String> record) {
-        log.info("Received message key - {}, value - {}", record.key(), record.value());
-        MESSAGES.add(record.value());
-    }
 
     public Flux<String> getMessages() {
-        return Flux.fromIterable(MESSAGES);
+        return storageService.getMessages();
+    }
+
+    public Mono<Void> deleteMessages() {
+        return storageService.deleteMessages();
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void consumeMessages() {
+        reactiveKafkaConsumerTemplate
+                .receiveAutoAck()
+                .doOnNext(record -> log.info("Received message key - {}, value - {}", record.key(), record.value()))
+                .flatMap(record -> storageService.addMessage(record.value()))
+                .onErrorContinue((e, record) -> log.error("Error occurred while consuming record: {}", record, e))
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
     }
 
 }
