@@ -10,6 +10,7 @@ jobs:
   build:
     # Define the environment where the job runs
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       # Step 1: Check out the code from the repository
