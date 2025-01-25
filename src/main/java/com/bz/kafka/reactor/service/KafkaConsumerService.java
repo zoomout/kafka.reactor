@@ -35,7 +35,7 @@ public class KafkaConsumerService {
                 .flatMap(record -> storageService.addMessage(record.value())
                         .then(Mono.fromRunnable(() -> record.receiverOffset().commit()))
                 )
-                .onErrorContinue((e, record) -> log.error("Error occurred while consuming record: {}", record, e))
+                .onErrorContinue((e, record) -> log.error("Error occurred while processing consumed record: {}", record, e))
                 .doOnTerminate(() -> {
                     log.info("Kafka consumer subscription terminated");
                 })
