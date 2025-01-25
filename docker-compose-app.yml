@@ -1,0 +1,22 @@
+name: kafka-reactor
+services:
+  app:
+    platform: linux/amd64
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      docker-net:
+    depends_on:
+      - kafka
+      - postgres
+    volumes:
+      - "./scripts/:/var/scripts/"
+    healthcheck:
+      test: [ "CMD", "/bin/bash", "-c", "/var/scripts/check_log.sh", '"Started KafkaReactorApplication"' ]
+      interval: 5s
+      retries: 10
+      start_period: 1s
+      timeout: 5s

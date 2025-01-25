@@ -1,0 +1,62 @@
+name: kafka-reactor
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      docker-net:
+    volumes:
+      - "./scripts/:/scripts/"
+    healthcheck:
+      test: [ "CMD", "/bin/bash", "-c", "/scripts/check_log.sh", '"PrepRequestProcessor (sid:0) started"' ]
+      interval: 5s
+      retries: 10
+      start_period: 1s
+      timeout: 5s
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    volumes:
+      - "./scripts/:/scripts/"
+    healthcheck:
+      test: [ "CMD", "/bin/bash", "-c", "/scripts/check_log.sh", '"started (kafka.server"' ]
+      interval: 5s
+      retries: 10
+      start_period: 1s
+      timeout: 5s
+    networks:
+      docker-net:
+  postgres:
+    image: "postgres:latest"
+    networks:
+      docker-net:
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user12345
+      POSTGRES_PASSWORD: password12345
+      POSTGRES_DB: mydb
+    volumes:
+      - "./scripts/:/scripts/"
+    healthcheck:
+      test: [ "CMD", "/bin/bash", "-c", "/scripts/check_log.sh", '"database system is ready to accept connections"']
+      interval: 5s
+      retries: 10
+      start_period: 1s
+      timeout: 5s
+
+networks:
+  docker-net:
