@@ -2,31 +2,26 @@ package com.bz.kafka.reactor.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class KafkaProducerService {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final ReactiveKafkaProducerTemplate<String, String> reactiveKafkaProducerTemplate;
 
-    public String sendMessage(String topic, String message) {
-        try {
-            val result = kafkaTemplate.send(topic, UUID.randomUUID().toString(), message).get();
-            val sentKey = result.getProducerRecord().key();
-            log.info("Sent message key - {}, value - {}", sentKey, message);
-            return sentKey;
-        } catch (InterruptedException | ExecutionException e) {
-            log.error("Couldn't send message", e);
-            throw new RuntimeException(e);
-        }
-
+    public Mono<String> sendMessage(String topic, String message) {
+        return Mono.fromCallable(() -> UUID.randomUUID().toString())
+                .flatMap(key -> reactiveKafkaProducerTemplate.send(topic, key, message)
+                        .doOnSuccess(result -> log.info("Sent message key - {}, value - {}", key, message))
+                        .doOnError(e -> log.error("Couldn't send message", e))
+                        .map(r -> key)
+                );
     }
 
 }
