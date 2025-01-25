@@ -62,21 +62,6 @@ class KafkaReactorApplicationIntegrationTest {
             assertThat(messages).isEqualTo("[\"MyMessage\"]");
         });
     }
-    @Test
-    void sendAndGetMessage2() {
-        RestAssured
-                .given()
-                .body("MyMessage")
-                .when().post("/messages")
-                .then().statusCode(200);
-        Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-            String messages = RestAssured
-                    .when().get("/messages")
-                    .then().statusCode(200)
-                    .extract().body().asString();
-            assertThat(messages).isEqualTo("[\"MyMessage\"]");
-        });
-    }
 
     @Test
     void sendAndGetMultipleMessages() {
@@ -106,21 +91,25 @@ class KafkaReactorApplicationIntegrationTest {
 
         RestAssured
                 .given()
+                .body("GoodMessage1")
+                .when().post("/messages");
+        RestAssured
+                .given()
                 .body(failingMessage)
                 .when().post("/messages")
                 .then().statusCode(200);
         RestAssured
                 .given()
-                .body("GoodMessage")
+                .body("GoodMessage2")
                 .when().post("/messages")
                 .then().statusCode(200);
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-            String messages = RestAssured
+            val messages = RestAssured
                     .when().get("/messages")
                     .then().statusCode(200)
                     .extract().body().asString();
-            assertThat(messages).isEqualTo("[\"GoodMessage\"]");
+            assertThat(messages).isEqualTo("[\"GoodMessage1\",\"GoodMessage2\"]");
         });
     }
 

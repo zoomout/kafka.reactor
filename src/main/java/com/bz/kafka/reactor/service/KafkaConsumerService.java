@@ -30,10 +30,15 @@ public class KafkaConsumerService {
     @EventListener(ApplicationReadyEvent.class)
     public void consumeMessages() {
         reactiveKafkaConsumerTemplate
-                .receiveAutoAck()
+                .receive()
                 .doOnNext(record -> log.info("Received message key - {}, value - {}", record.key(), record.value()))
-                .flatMap(record -> storageService.addMessage(record.value()))
-                .onErrorContinue((e, record) -> log.error("Error occurred while consuming record: {}", record, e))
+                .flatMap(record -> storageService.addMessage(record.value())
+                        .then(Mono.fromRunnable(() -> record.receiverOffset().commit()))
+                )
+                .onErrorContinue((e, record) -> log.error("Error occurred while processing consumed record: {}", record, e))
+                .doOnTerminate(() -> {
+                    log.info("Kafka consumer subscription terminated");
+                })
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe();
     }
