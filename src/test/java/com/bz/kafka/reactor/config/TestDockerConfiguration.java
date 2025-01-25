@@ -1,4 +1,4 @@
-package com.bz.kafka.reactor;
+package com.bz.kafka.reactor.config;
 
 import lombok.val;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -9,12 +9,12 @@ import org.testcontainers.containers.ComposeContainer;
 import java.io.File;
 
 @TestConfiguration(proxyBeanMethods = false)
-class TestcontainersConfiguration {
+public class TestDockerConfiguration {
 
     @Bean(destroyMethod = "stop")
     @ServiceConnection
     public ComposeContainer kafkaContainer() {
-        final ComposeContainer composeContainer = new ComposeContainer(
+        val composeContainer = new ComposeContainer(
                 new File("docker-compose-dependencies.yml")
         )
                 .withExposedService("kafka", 9092)
