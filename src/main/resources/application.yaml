@@ -1,0 +1,41 @@
+server:
+  port: 8080
+management:
+  endpoint:
+    health:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+spring:
+  application:
+    name: kafka.reactor
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/mydb
+    username: user12345
+    password: password12345
+  liquibase:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/mydb
+    user: user12345
+    password: password12345
+    change-log: classpath:db/changelog/0_db.changelog-master.yaml
+  kafka:
+    producer:
+      bootstrapServers:
+      keySerializer: org.apache.kafka.common.serialization.StringSerializer
+      valueSerializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+    consumer:
+      bootstrapServers:
+      groupId: my-consumer-group
+      keyDeserializer: org.apache.kafka.common.serialization.StringDeserializer
+      valueDeserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enableAutoCommit: false
+      isolationLevel: read_committed
+      autoOffsetReset: latest
+    listener:
+      type: single
+      missing-topics-fatal: false

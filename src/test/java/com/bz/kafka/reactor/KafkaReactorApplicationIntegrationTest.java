@@ -1,7 +1,10 @@
 package com.bz.kafka.reactor;
 
-import com.bz.kafka.reactor.config.TestDockerConfiguration;
+import com.bz.kafka.reactor.config.TestSetupConfiguration;
 import com.bz.kafka.reactor.service.StorageService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import lombok.val;
 import org.awaitility.Awaitility;
@@ -16,11 +19,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-@Import(TestDockerConfiguration.class)
+@Import({TestSetupConfiguration.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles(profiles = "test")
@@ -105,11 +109,19 @@ class KafkaReactorApplicationIntegrationTest {
                 .then().statusCode(200);
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-            val messages = RestAssured
+            val body = RestAssured
                     .when().get("/messages")
                     .then().statusCode(200)
                     .extract().body().asString();
-            assertThat(messages).isEqualTo("[\"GoodMessage1\",\"GoodMessage2\"]");
+            val actual = asListOfStrings(body);
+            assertThat(actual).hasSize(2);
+            assertThat(actual).contains("GoodMessage1");
+            assertThat(actual).contains("GoodMessage2");
+        });
+    }
+
+    private static List<String> asListOfStrings(String body) throws JsonProcessingException {
+        return new ObjectMapper().readValue(body, new TypeReference<>() {
         });
     }
 
