@@ -10,6 +10,9 @@ import reactor.kafka.sender.SenderRecord;
 
 import java.util.UUID;
 
+/**
+ * Sends messages to Kafka topic
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

@@ -9,6 +9,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static com.bz.kafka.reactor.config.ReactiveKafkaConfig.KAFKA_TOPIC;
+
 @RestController
 @RequestMapping(path = "/messages")
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class MessageController {
 
     @PostMapping
     public Mono<String> sendMessage(@RequestBody String message) {
-        return Mono.defer(() -> kafkaProducerService.sendMessage("my-topic", message));
+        return Mono.defer(() -> kafkaProducerService.sendMessage(KAFKA_TOPIC, message));
     }
 
     @GetMapping

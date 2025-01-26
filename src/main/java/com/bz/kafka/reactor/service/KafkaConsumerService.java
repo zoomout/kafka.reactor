@@ -10,6 +10,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+/**
+ * Receives messages from Kafka topic
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor

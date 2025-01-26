@@ -17,6 +17,8 @@ import static org.apache.kafka.clients.producer.ProducerConfig.TRANSACTIONAL_ID_
 @Configuration
 public class ReactiveKafkaConfig {
 
+    public static final String KAFKA_TOPIC = "my-topic";
+
     @Bean
     public ReactiveKafkaProducerTemplate<String, String> reactiveKafkaProducerTemplate(
             KafkaProperties properties
@@ -35,7 +37,7 @@ public class ReactiveKafkaConfig {
     ) {
         return new ReactiveKafkaConsumerTemplate<>(
                 ReceiverOptions.<String, String>create(properties.buildConsumerProperties())
-                        .subscription(List.of("my-topic"))
+                        .subscription(List.of(KAFKA_TOPIC))
         );
     }
 
