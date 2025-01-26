@@ -1,3 +1,13 @@
 spring:
   r2dbc:
     url: r2dbc:postgresql://postgres:5432/mydb
+  liquibase:
+    url: jdbc:postgresql://postgres:5432/mydb
+#    contexts: test
+    drop-first: true
+  kafka:
+    consumer:
+      bootstrapServers: kafka:29092
+      autoOffsetReset: earliest
+    producer:
+      bootstrapServers: kafka:29092

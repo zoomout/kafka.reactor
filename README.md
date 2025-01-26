@@ -15,12 +15,12 @@
 ./mvnw clean package -DskipTests=true
 ```
 
-## Start docker app
+## UP - docker
 ```bash
-docker compose -f ./docker-compose-dependencies.yml -f ./docker-compose-app.yml up --build -d
+./mvnw clean package -DskipTests=true && docker compose -f ./docker-compose-dependencies.yml -f ./docker-compose-app.yml up --build -d
 ```
 
-## Stop docker app
+## DOWN - docker
 ```bash
 docker compose -f ./docker-compose-dependencies.yml -f ./docker-compose-app.yml down -v
 ```
