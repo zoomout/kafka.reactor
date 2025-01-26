@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: bz
+      changes:
+        - sql:
+            sql: "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
+  - changeSet:
+      id: 2
+      author: bz
+      changes:
+        - createTable:
+            tableName: messages
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  defaultValueComputed: "uuid_generate_v4()"
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: message
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false

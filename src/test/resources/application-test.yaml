@@ -1,0 +1,12 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/mydb
+  liquibase:
+    contexts: test
+    drop-first: true
+  kafka:
+    consumer:
+      bootstrapServers: localhost:9092
+      autoOffsetReset: earliest
+    producer:
+      bootstrapServers: localhost:9092
