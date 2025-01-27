@@ -7,7 +7,7 @@ spring:
     drop-first: true
   kafka:
     consumer:
-      bootstrapServers: kafka:29092
+      bootstrapServers: kafka:29092,kafka2:29093
       autoOffsetReset: earliest
     producer:
-      bootstrapServers: kafka:29092
+      bootstrapServers: kafka:29092,kafka2:29093
